@@ -3,8 +3,9 @@ WITH
 	(SELECT
 		emp.matr,
 		emp.nome,
+     	emp.lotacao_div,
 		div.cod_divisao,
-		(tsalario.salario - tdescontos.descontos) AS salario_liquido
+		(tsalario.salario - tdescontos.descontos) AS salario
 	FROM
 		empregado emp
 		INNER JOIN divisao div ON emp.lotacao_div = div.cod_divisao
@@ -32,11 +33,12 @@ WITH
 		emp.matr,
 		emp.nome,
 		div.cod_divisao,
+    	emp.lotacao_div,
 		tsalario.salario,
 		tdescontos.descontos),
 	media_salarial AS 
 	(SELECT
-		ROUND(AVG(base.salario_liquido), 2) AS media,
+		ROUND(AVG(base.salario), 2) AS media,
 		div.cod_divisao
 	FROM
 		base
@@ -46,14 +48,12 @@ WITH
 	)
 SELECT
 	base.nome,
-	base.salario_liquido
+	base.salario
 FROM
 	base
 		INNER JOIN divisao div ON div.cod_divisao = base.cod_divisao
 		INNER JOIN media_salarial ms ON div.cod_divisao = ms.cod_divisao
 WHERE
-	salario_liquido >= ms.media
+	salario >= ms.media AND salario > 8000
 ORDER BY
-    salario_liquido DESC
-
--- exercício não recebeu accepted, porém a saída é igual ao exemplo de saída do exercício.
+	base.lotacao_div, base.nome
